@@ -9,6 +9,7 @@ import { LoveLuckView } from '@/components/fortune/LoveLuckView'
 import { FinanceLuckView } from '@/components/fortune/FinanceLuckView'
 import { HealthLuckView } from '@/components/fortune/HealthLuckView'
 import { CareerLuckView } from '@/components/fortune/CareerLuckView'
+import { AdBanner } from '@/components/ui/AdBanner'
 import { useSajuStore } from '@/store/saju-store'
 import type { FortuneCategory } from '@/types/saju'
 
@@ -69,7 +70,9 @@ export function FortuneDetailPage() {
           allReadings={history}
           onSelectReading={handleSelectReading}
         />
+        <AdBanner slot="fortune-top" format="horizontal" className="mb-4" />
         {renderView()}
+        <AdBanner slot="fortune-bottom" format="rectangle" className="mt-6" />
       </div>
     </AnimatedPage>
   )
