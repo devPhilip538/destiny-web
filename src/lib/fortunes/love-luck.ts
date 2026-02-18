@@ -1,6 +1,7 @@
 import type { SajuResult, FiveElement, TenGodName, LoveLuckResult } from '@/types/saju'
 import { CHEONGAN_ELEMENT, GENERATING, OVERCOMING, GENERATED_BY, OVERCOME_BY, YANG_STEMS, YANG_BRANCHES } from '../constants'
 import { getRelationScore } from './daily-fortune'
+import { analyzeYongshin, getElementFavorability } from '../yongshin'
 
 function determineTenGod(dayMasterElement: FiveElement, dayMasterYang: boolean, targetElement: FiveElement, targetYang: boolean): TenGodName {
   const samePolarity = dayMasterYang === targetYang
@@ -63,6 +64,13 @@ export function calculateLoveLuck(result: SajuResult, gender: 'male' | 'female')
   }
   if (loveStarCount >= 2) currentLoveScore = Math.min(100, currentLoveScore + 15)
   else if (loveStarCount === 1) currentLoveScore = Math.min(100, currentLoveScore + 8)
+
+  // 용신 보정: 현재 대운 오행이 용신이면 연애운도 상승
+  const yongshinAnalysis = analyzeYongshin(result)
+  if (currentCycle) {
+    const cycleFav = getElementFavorability(yongshinAnalysis, currentCycle.cheonganElement)
+    currentLoveScore = Math.max(10, Math.min(100, currentLoveScore + Math.round(cycleFav * 10)))
+  }
 
   const elementInfluence = getElementInfluence(dominant)
   const strengths = getLoveStrengths(dominant, loveStarCount)

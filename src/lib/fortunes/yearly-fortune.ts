@@ -1,6 +1,7 @@
 import type { FiveElement, SajuResult, YearlyFortuneResult, TenGodName } from '@/types/saju'
 import { CHEONGAN, JIJI, CHEONGAN_HANJA, JIJI_HANJA, CHEONGAN_ELEMENT, JIJI_ELEMENT, GENERATING, OVERCOMING, GENERATED_BY, OVERCOME_BY, YANG_STEMS } from '../constants'
 import { getRelationScore } from './daily-fortune'
+import { analyzeYongshin, getElementFavorability } from '../yongshin'
 
 function getYearPillar(year: number) {
   const stemIdx = (year - 4) % 10
@@ -65,7 +66,13 @@ export function calculateYearlyFortune(result: SajuResult, _birthYear: number): 
   const stemScore = getRelationScore(dayMasterElement, yearPillar.cheonganElement)
   const branchScore = getRelationScore(result.dayPillar.jijiElement, yearPillar.jijiElement)
   const baseScore = 50 + stemScore + branchScore
-  const score = Math.max(10, Math.min(100, baseScore))
+
+  // 용신 보정: 올해 오행이 용신/희신이면 보너스, 기신/구신이면 페널티
+  const yongshinAnalysis = analyzeYongshin(result)
+  const yearStemFav = getElementFavorability(yongshinAnalysis, yearPillar.cheonganElement)
+  const yearBranchFav = getElementFavorability(yongshinAnalysis, yearPillar.jijiElement)
+  const yongshinBonus = Math.round((yearStemFav + yearBranchFav) * 8)
+  const score = Math.max(10, Math.min(100, baseScore + yongshinBonus))
 
   const currentLuckCycle = result.luckCycles?.find(c => c.isCurrent)
   const currentLuckStr = currentLuckCycle
@@ -81,7 +88,11 @@ export function calculateYearlyFortune(result: SajuResult, _birthYear: number): 
     const mStemScore = getRelationScore(dayMasterElement, mElement)
     const mBranchScore = getRelationScore(result.dayPillar.jijiElement, mBranchElement)
     const monthSeed = (currentYear * 100 + m) % 15
-    const mScore = Math.max(10, Math.min(100, 50 + mStemScore + mBranchScore + (monthSeed - 7)))
+    // 월별 용신 보정
+    const mStemFav = getElementFavorability(yongshinAnalysis, mElement)
+    const mBranchFav = getElementFavorability(yongshinAnalysis, mBranchElement)
+    const mYongshinBonus = Math.round((mStemFav + mBranchFav) * 6)
+    const mScore = Math.max(10, Math.min(100, 50 + mStemScore + mBranchScore + (monthSeed - 7) + mYongshinBonus))
     monthlyOverview.push({ month: m, score: mScore, keyword: getMonthlyKeyword(mScore) })
   }
 

@@ -1,5 +1,6 @@
-import type { Pillar, FiveElement, DailyFortuneResult } from '@/types/saju'
+import type { Pillar, FiveElement, DailyFortuneResult, SajuResult } from '@/types/saju'
 import { CHEONGAN, JIJI, CHEONGAN_HANJA, JIJI_HANJA, CHEONGAN_ELEMENT, JIJI_ELEMENT, GENERATING, OVERCOMING } from '../constants'
+import { analyzeYongshin, getElementFavorability } from '../yongshin'
 
 export function getPillarForDate(date: Date): { cheongan: string; jiji: string; cheonganHanja: string; jijiHanja: string; cheonganElement: FiveElement; jijiElement: FiveElement } {
   const baseDate = new Date(1900, 0, 31)
@@ -112,4 +113,32 @@ function getAdviceText(score: number, myEl: FiveElement): string {
     '수': ['물 가까이에서 영감을 받을 수 있습니다.', '차분한 시간이 지혜를 가져다 줍니다.'],
   }
   return adviceMap[myEl][score >= 60 ? 0 : 1]
+}
+
+/**
+ * 용신 기반 일일 운세 계산 (고급 버전)
+ * 오늘의 오행이 용신/희신이면 보너스, 기신/구신이면 페널티
+ */
+export function calculateDailyFortuneAdvanced(result: SajuResult): DailyFortuneResult {
+  const base = calculateDailyFortune(result.dayPillar)
+  const yongshinAnalysis = analyzeYongshin(result)
+
+  const today = getTodayPillar()
+  const stemFavorability = getElementFavorability(yongshinAnalysis, today.cheonganElement)
+  const branchFavorability = getElementFavorability(yongshinAnalysis, today.jijiElement)
+
+  // 용신 보정: -15 ~ +15 범위
+  const yongshinBonus = Math.round((stemFavorability + branchFavorability) * 7.5)
+  const adjustedScore = Math.max(10, Math.min(100, base.score + yongshinBonus))
+
+  const adjustedCategories = base.categories.map(cat => ({
+    ...cat,
+    score: Math.max(10, Math.min(100, cat.score + Math.round(yongshinBonus * 0.7))),
+  }))
+
+  return {
+    ...base,
+    score: adjustedScore,
+    categories: adjustedCategories,
+  }
 }

@@ -1,5 +1,6 @@
 import type { SajuResult, FiveElement, TenGodName, MarriageLuckResult } from '@/types/saju'
 import { CHEONGAN_ELEMENT, GENERATING, OVERCOMING, GENERATED_BY, OVERCOME_BY, YANG_STEMS, YANG_BRANCHES } from '../constants'
+import { analyzeYongshin, getElementFavorability } from '../yongshin'
 
 function determineTenGod(dayMasterElement: FiveElement, dayMasterYang: boolean, targetElement: FiveElement, targetYang: boolean): TenGodName {
   const samePolarity = dayMasterYang === targetYang
@@ -90,7 +91,13 @@ export function calculateMarriageLuck(result: SajuResult, gender: 'male' | 'fema
   if (spouseStarPositions.some(p => p.includes('일주'))) marriageScore += 10
   if (doHwaSalPositions.length > 0) marriageScore += 5
   if (bestMarriageAges.length > 0) marriageScore += 5
-  marriageScore = Math.min(100, marriageScore)
+
+  // 용신 보정: 배우자 오행이 용신이면 보너스, 기신이면 페널티
+  const yongshinAnalysis = analyzeYongshin(result)
+  const spouseFav = getElementFavorability(yongshinAnalysis, spouseElement)
+  marriageScore += Math.round(spouseFav * 10)
+
+  marriageScore = Math.max(10, Math.min(100, marriageScore))
 
   return {
     spouseStar,

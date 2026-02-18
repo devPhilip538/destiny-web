@@ -1,6 +1,7 @@
 import type { SajuResult, FiveElement, TenGodName, CareerLuckResult } from '@/types/saju'
 import { CHEONGAN_ELEMENT, GENERATING, OVERCOMING, GENERATED_BY, OVERCOME_BY, YANG_STEMS, YANG_BRANCHES } from '../constants'
 import { getRelationScore } from './daily-fortune'
+import { analyzeYongshin, getElementFavorability } from '../yongshin'
 
 function determineTenGod(dayMasterElement: FiveElement, dayMasterYang: boolean, targetElement: FiveElement, targetYang: boolean): TenGodName {
   const samePolarity = dayMasterYang === targetYang
@@ -95,6 +96,13 @@ export function calculateCareerLuck(result: SajuResult, _birthYear: number): Car
   }
   const gwanCount = (starCounts.get('정관') || 0) + (starCounts.get('편관') || 0)
   currentCareerScore = Math.min(100, currentCareerScore + gwanCount * 8)
+
+  // 용신 보정: 현재 대운 오행이 용신이면 직장운도 상승
+  const yongshinAnalysis = analyzeYongshin(result)
+  if (currentCycle) {
+    const cycleFav = getElementFavorability(yongshinAnalysis, currentCycle.cheonganElement)
+    currentCareerScore = Math.max(10, Math.min(100, currentCareerScore + Math.round(cycleFav * 10)))
+  }
 
   const dominant = result.fiveElementBalance.dominant
   const suitableJobs = getSuitableJobs(dominant, careerStars)

@@ -1,5 +1,6 @@
 import type { SajuResult, FiveElement, TenGodName, FinanceLuckResult } from '@/types/saju'
 import { CHEONGAN_ELEMENT, GENERATING, OVERCOMING, GENERATED_BY, OVERCOME_BY, YANG_STEMS, YANG_BRANCHES } from '../constants'
+import { analyzeYongshin, getElementFavorability } from '../yongshin'
 
 function determineTenGod(dayMasterElement: FiveElement, dayMasterYang: boolean, targetElement: FiveElement, targetYang: boolean): TenGodName {
   const samePolarity = dayMasterYang === targetYang
@@ -55,7 +56,14 @@ export function calculateFinanceLuck(result: SajuResult, _birthYear: number): Fi
   wealthScore += windfall * 8
   // 식신은 재성을 생하는 신이므로 보너스
   if (result.tenGods?.some(t => t.cheonganTenGod === '식신' || t.jijiTenGod === '식신')) wealthScore += 5
-  wealthScore = Math.min(100, wealthScore)
+
+  // 용신 보정: 재성(내가 극하는) 오행이 용신이면 재물운 대폭 상승
+  const yongshinAnalysis = analyzeYongshin(result)
+  const wealthElement = OVERCOMING[dayMasterElement] // 재성 오행
+  const wealthFav = getElementFavorability(yongshinAnalysis, wealthElement)
+  wealthScore += Math.round(wealthFav * 12)
+
+  wealthScore = Math.max(10, Math.min(100, wealthScore))
 
   // 대운에서 재성 나타나는 시기
   const bestInvestmentAges: number[] = []

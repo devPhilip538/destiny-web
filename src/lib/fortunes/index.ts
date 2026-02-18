@@ -1,4 +1,4 @@
-export { calculateDailyFortune, getTodayPillar, getPillarForDate, getRelationScore } from './daily-fortune'
+export { calculateDailyFortune, calculateDailyFortuneAdvanced, getTodayPillar, getPillarForDate, getRelationScore } from './daily-fortune'
 export { calculateWeeklyFortune } from './weekly-fortune'
 export { calculateYearlyFortune } from './yearly-fortune'
 export { calculateMarriageLuck } from './marriage-luck'

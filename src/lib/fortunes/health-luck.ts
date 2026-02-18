@@ -1,4 +1,5 @@
 import type { SajuResult, FiveElement, HealthLuckResult } from '@/types/saju'
+import { analyzeYongshin, getElementFavorability } from '../yongshin'
 
 const ORGAN_MAP: Record<FiveElement, string> = {
   '목': '간/담낭',
@@ -51,6 +52,15 @@ export function calculateHealthLuck(result: SajuResult): HealthLuckResult {
   const excessCount = organMapping.filter(o => o.status === 'excess').length
   const normalCount = organMapping.filter(o => o.status === 'normal' || o.status === 'strong').length
   let healthScore = 70 + normalCount * 5 - weakCount * 10 - excessCount * 8
+
+  // 용신 보정: 용신 오행의 장부는 보호, 기신 오행의 장부는 취약
+  const yongshinAnalysis = analyzeYongshin(result)
+  for (const organ of organMapping) {
+    const fav = getElementFavorability(yongshinAnalysis, organ.element)
+    // 용신 오행(+1.0) 장부는 보호 → +5, 기신 오행(-1.0) 장부는 취약 → -5
+    healthScore += Math.round(fav * 5)
+  }
+
   healthScore = Math.max(10, Math.min(100, healthScore))
 
   const preventionTips = getPreventionTips(balance.dominant, balance.lacking, weakOrgans)
