@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/((?!assets|favicon|ads\\.txt).*)", "destination": "/index.html" }
+  ]
+}

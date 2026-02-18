@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="32" fill="url(#bg)"/>
+  <!-- Yin-Yang symbol -->
+  <path d="M32 8 A24 24 0 0 1 32 56 A12 12 0 0 1 32 32 A12 12 0 0 0 32 8 Z" fill="#F59E0B"/>
+  <path d="M32 8 A24 24 0 0 0 32 56 A12 12 0 0 0 32 32 A12 12 0 0 1 32 8 Z" fill="white" fill-opacity="0.9"/>
+  <circle cx="32" cy="20" r="3.5" fill="white" fill-opacity="0.9"/>
+  <circle cx="32" cy="44" r="3.5" fill="#F59E0B"/>
+  <!-- Sparkle accents -->
+  <circle cx="12" cy="12" r="1.5" fill="url(#sparkle)" opacity="0.8"/>
+  <circle cx="52" cy="12" r="1" fill="url(#sparkle)" opacity="0.6"/>
+  <circle cx="52" cy="52" r="1.5" fill="url(#sparkle)" opacity="0.8"/>
+  <circle cx="12" cy="52" r="1" fill="url(#sparkle)" opacity="0.6"/>
+</svg>
